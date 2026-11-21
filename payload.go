@@ -11,6 +11,6 @@ type scheduleRequest struct {
 	Employees      []Employee `json:"employees"`
 }
 type scheduleResponse struct {
-	Month  time.Time `json:"month"`
-	Shifts []Shift   `json:"shifts"`
+	Month  time.Time     `json:"month"`
+	Shifts []DaySchedule `json:"shifts"`
 }

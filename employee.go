@@ -10,9 +10,11 @@ type Employee struct {
 	Name           string
 	PreferredDates []time.Time
 	BlockedDates   []time.Time
+	maxSeries      int
+	minSeries      int
 }
 
-func NewEmployee(name string, preferredDates []string, blockedDates []string) (*Employee, error) {
+func NewEmployee(name string, preferredDates []string, blockedDates []string, defaultMaxSeries, defaultMinSeries int) (*Employee, error) {
 	const op = "newEmployee"
 
 	err := ValidateDates(preferredDates, blockedDates)
@@ -42,6 +44,8 @@ func NewEmployee(name string, preferredDates []string, blockedDates []string) (*
 		Name:           name,
 		PreferredDates: preferredDatesParsed,
 		BlockedDates:   blockedDatesParsed,
+		maxSeries:      defaultMaxSeries,
+		minSeries:      defaultMinSeries,
 	}, nil
 }
 
