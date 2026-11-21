@@ -53,7 +53,9 @@ func NewSchedule(dateFrom time.Time, dateTo time.Time, necessaryCount int, emplo
 
 		// Сортируем кандидатов по приоритету
 		// это базовая функция, которая считает скоринг
-		slices.SortFunc(available, compareScore)
+		slices.SortFunc(available, func(a, b *EmployeeState) int {
+			return calculateScore(a, currentDate) - calculateScore(b, currentDate)
+		})
 
 		// Набираем смену на день
 		assignedEmployes := make([]*Employee, 0, 2)
@@ -114,11 +116,7 @@ func createStates(employees []*Employee) []*EmployeeState {
 	return states
 }
 
-func compareScore(emp1, emp2 *EmployeeState) int {
-	return calculateScore(*emp1) - calculateScore(*emp2)
-}
-
-func calculateScore(empState EmployeeState) int {
+func calculateScore(empState EmployeeState, currentDate time.Time) int {
 	// Базовое - количество смен
 	score := empState.totalShifts * shiftMultiple
 	// Убавляем баллы, если не хватает до минимальной серии
@@ -133,10 +131,9 @@ func calculateScore(empState EmployeeState) int {
 	if empState.shiftSeries > empState.minSeries {
 		score = score + FineLongSeries
 	}
-	// TODO: не работает - в этой реализации нельзя передать текущую дату в функцию сравнения, надо починить
 	// Бонус за предпочтительный день
-	//if emp.preferred[currentDay] {
-	//	emp.score = emp.score + preferredDayBonus
-	//}
+	if empState.preferred[currentDate] {
+		score = score + preferredDayBonus
+	}
 	return score
 }
