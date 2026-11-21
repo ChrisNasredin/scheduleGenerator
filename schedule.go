@@ -117,23 +117,32 @@ func createStates(employees []*Employee) []*EmployeeState {
 }
 
 func calculateScore(empState *EmployeeState, currentDate time.Time) int {
-	// Базовое - количество смен
+	// Слабое выравнивание общего количества смен
 	score := empState.totalShifts * shiftMultiple
-	// Убавляем баллы, если не хватает до минимальной серии
+
+	// Чем длиннее текущая серия — тем приоритетнее продолжить её
+	score += empState.shiftSeries * seriesMultiple
+
+	// Ещё сильнее толкаем тех, кто не доработал до минимальной серии
 	if empState.shiftSeries < empState.minSeries {
-		score = score + needSeriaScoreBonus
+		score += needSeriaScoreBonus
 	}
-	// Добавляем, если превысили максимальную серию
-	if empState.shiftSeries > empState.maxSeries {
-		score = score + FineTooLongSeries
-	}
-	// Штраф за превышение минимальной серии
+
+	// Штраф за превышение минимальной серии — мягкий
 	if empState.shiftSeries > empState.minSeries {
-		score = score + FineLongSeries
+		score += FineLongSeries
 	}
-	// Бонус за предпочтительный день
+
+	// Жёсткий накопительный штраф за превышение максимальной серии:
+	// каждый день сверх лимита — 500 очков
+	if empState.shiftSeries > empState.maxSeries {
+		score += (empState.shiftSeries - empState.maxSeries) * FineTooLongSeries
+	}
+
+	// Предпочтительный день — приятный, но не решающий фактор
 	if empState.preferred[currentDate] {
-		score = score + preferredDayBonus
+		score += preferredDayBonus
 	}
+
 	return score
 }
