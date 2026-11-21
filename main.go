@@ -74,15 +74,34 @@ func main() {
 	schedule, err := NewSchedule(
 		time.Date(2026, time.December, 01, 0, 0, 0, 0, time.UTC), // Дата начала
 		time.Date(2026, time.December, 31, 0, 0, 0, 0, time.UTC), // Конечная дата
-		2,                                   // Необходимое количество на смене
+		3,                                   // Необходимое количество на смене
 		[]*Employee{emp1, emp2, emp3, emp4}, // Список сотрудников
 	)
 
 	for _, day := range schedule.Shifts {
-		fmt.Printf("Дата: %s, Список сотрудников:\n", day.Date)
+		fmt.Printf("Дата: %s, день уомплектован: %t, Список сотрудников:\n", day.Date, !day.IsIncomplete)
 		for _, employee := range day.Employees {
 			fmt.Println(employee.Name)
 		}
+	}
 
+	countAndPrintShifts(schedule)
+
+}
+
+func countAndPrintShifts(schedule *Schedule) {
+	counts := make(map[string]int)
+
+	// Считаем
+	for _, day := range schedule.Shifts {
+		for _, emp := range day.Employees {
+			// Предполагаем, что у Employee есть поле Name
+			counts[emp.Name]++
+		}
+	}
+
+	// Выводим
+	for name, shifts := range counts {
+		fmt.Printf("%s: %d смен\n", name, shifts)
 	}
 }

@@ -116,7 +116,7 @@ func createStates(employees []*Employee) []*EmployeeState {
 	return states
 }
 
-func calculateScore(empState EmployeeState, currentDate time.Time) int {
+func calculateScore(empState *EmployeeState, currentDate time.Time) int {
 	// Базовое - количество смен
 	score := empState.totalShifts * shiftMultiple
 	// Убавляем баллы, если не хватает до минимальной серии
